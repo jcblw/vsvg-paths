@@ -1,0 +1,34 @@
+{
+  "name": "vsvg-paths",
+  "version": "0.0.0",
+  "description": "A simple encoder decoder of svgs paths",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint && faucet",
+    "lint": "jshint ./index.js",
+    "examples": "browserify examples/index.js -o examples/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jcblw/vsvg-paths"
+  },
+  "keywords": [
+    "svg",
+    "server",
+    "paths",
+    "decode",
+    "encode"
+  ],
+  "author": "Jacob Lowe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jcblw/vsvg-paths/issues"
+  },
+  "homepage": "https://github.com/jcblw/vsvg-paths",
+  "devDependencies": {
+    "browserify": "^6.3.2",
+    "faucet": "0.0.1",
+    "jshint": "^2.5.10",
+    "tape": "^3.0.3"
+  }
+}
