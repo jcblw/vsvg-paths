@@ -94,6 +94,9 @@ var stringifyPoints =
 module.exports._stringifyPoints =
 function stringifyPoints( instructions ) {
     return function( point, index ) {
+        if ( !point.length ) {
+            return instructions[ index ]; // should be a close
+        }
         return point.map( getValue( instructions[ index ] ) ).join( ' ' );
     }
 };
@@ -134,5 +137,6 @@ function getInstruction ( points, index ) {
     if ( isValid( points.y ) ) {
         return 'V';
     }
+    return 'Z';
 };
 

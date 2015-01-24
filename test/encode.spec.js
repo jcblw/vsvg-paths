@@ -56,10 +56,13 @@ test( 'testing encode::_stringifyPoints', function( t ) {
     
     var inst = [ 'foo', 'bar' ],
         point = [['bar', 'baz'],['qux', 'xar']],
+        emptyPoint = [],
         stringPoint = encode._stringifyPoints( inst )( point, 1 );
+        stringPointEmpty = encode._stringifyPoints( inst )( emptyPoint, 0 );
 
     t.equals( typeof stringPoint, 'string', 'the return of the returned function of string points is a string' );
     t.equals( stringPoint, 'barbaz xar', 'the string return is compiled of the value ( base of index passed in as second argument of returned function ) from the first array passed into the initial function and the the second value of each item in the collection passed into the first argument of the returned array' );
+    t.equals( stringPointEmpty, 'foo', 'the string that is returned to the returned function when an empty array is given is just the instruction ( based off index passed in as second argument of returned function )' );
     t.end();
 });
 
@@ -81,6 +84,7 @@ test( 'testing encode::_getInstruction', function( t ) {
     t.equals( encode._getInstruction({x:0,y:0}, true), 'L', 'when passing in a point with a x,y keys and a truthy second argument the string "L" will be returned' ); 
     t.equals( encode._getInstruction({x:0}), 'H', 'when passing in a point with a x key the string "H" will be returned' ); 
     t.equals( encode._getInstruction({y:0}), 'V', 'when passing in a point with a y key the string "V" will be returned' ); 
+    t.equals( encode._getInstruction({}), 'Z', 'when passing in a point with no keys the string "Z" will be returned' );
     t.end();
 } );
 
@@ -92,7 +96,7 @@ test( 'testing encode::encode', function( t ) {
         { x2: 400, y2: 300, x: 400, y: 200 }, // shorthand curve
         { x: 500 }, // horizontal line
         { y: 100 }, // vertical line
-        {
+        { // elliptical arc
             rx: 25,
             ry: 25,
             xrotate: -30,
@@ -100,9 +104,11 @@ test( 'testing encode::encode', function( t ) {
             sweep: 1,
             x: 250,
             y: 250
-        }
+        },
+        { x1: 100, y1: 300, x: 25, y: 250 }, // quadratic Bézier 
+        {}
     ];
-    t.equals( encode.encode( path ), 'M5 5 L100 200 C100 100 250 100 250 200 S400 300 400 200 H500 V100 A25 25 -30 0 1 250 250', 'the correct path is outputed' );
-    t.equals( encode.encode( path, true ), 'm5 5 l100 200 c100 100 250 100 250 200 s400 300 400 200 h500 v100 a25 25 -30 0 1 250 250', 'the correct path is outputed, with lowercase instructions for relative positioning' );
+    t.equals( encode.encode( path ), 'M5 5 L100 200 C100 100 250 100 250 200 S400 300 400 200 H500 V100 A25 25 -30 0 1 250 250 Q100 300 25 250 Z', 'the correct path is outputed' );
+    t.equals( encode.encode( path, true ), 'm5 5 l100 200 c100 100 250 100 250 200 s400 300 400 200 h500 v100 a25 25 -30 0 1 250 250 q100 300 25 250 z', 'the correct path is outputed, with lowercase instructions for relative positioning' );
     t.end();
 });

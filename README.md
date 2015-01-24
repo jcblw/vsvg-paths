@@ -77,7 +77,6 @@ path.setAttribute( 'd', data );
 }
 ```
 - Quadratic Bézier Curve To: a point that has a x1, y1, x, and y value. eg
-
 ```json
 {
     "x1": 250,
@@ -98,9 +97,12 @@ path.setAttribute( 'd', data );
     "y": 250
 }
 ```
-
+- Close Path
+```json
+{}
+```
 # What this needs
 
-- decoded
+- shorthand quadratic Bézier 
+- decoder
 - support for absolute and relative positioning in same path
-- closing paths
