@@ -30,7 +30,7 @@ path.setAttribute( 'd', data );
 
 ### Points types
 
-Very closely based off of (Path Data Spec)[http://www.w3.org/TR/SVG/paths.html#PathData]. Please referance there for more specifics of what points represent.
+Very closely based off of [Path Data Spec](http://www.w3.org/TR/SVG/paths.html#PathData). Please referance there for more specifics of what points represent.
 
 - Move To: The first point in an array of points that has only a x and y value eg.
 ```json
