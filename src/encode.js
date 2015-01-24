@@ -101,6 +101,9 @@ function stringifyPoints( instructions ) {
 var isValid =
 module.exports._isValid =
 function isValid ( value ) {
+    if ( isNaN( value ) ) {
+        return false;
+    }
     return value || typeof value === 'number';
 };
 
