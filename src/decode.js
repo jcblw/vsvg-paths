@@ -3,58 +3,63 @@
 
 var eachInstPattern = /(([a-z]+)(\s?\,?(\-?[0-9]+\.?[0-9]*))+)/gi,
     instPattern = /([a-z]+)|(\-?[0-9]+\.?[0-9]*)/gi,
-    alphastart = /^[A-Z]/i
-
-// split instructions nicely /([a-z]+)|\s?\,?(\-?[0-9]+\.?[0-9]*)/gi
-// pull only the good values out /([a-z]+)|(\-?[0-9]+\.?[0-9]*)/gi
+    alphastart = /^[A-Z]/i,
+    lengths = {
+        V: 2,
+        H: 2,
+        L: 3,
+        M: 3,
+        S: 5,
+        Q: 5,
+        A: 8,
+        C: 7
+    }
 
 function splitInstruction ( instruction ) {
-    return instruction.match( instPattern )
-            .filter( filterNull )
-            .map( trimEach )
-            .filter( filterNull )
-
+    return instruction.match( instPattern );
 }
 
 function startsWithAlpha ( instruction ) {
     return alphastart.test( instruction )
 }
 
-function multiPoint( instruction, length ) {
-    if ( instruction.length <= length ) {
+function expandMultiPoints( accumulator, instruction ) {
+    
+    var instruct = instruction[ 0 ].toUpperCase(),
+        length = lengths[ instruct ],
+        next
+
+    accumulator.push( instruction )
+    if ( typeof length !== 'number' || instruction.length <= length ) {
         return
     }
 
-    var next = instruction.slice( length )
+    next = instruction.slice( length )
+    next.unshift( instruction[0] ) // keeping same intructor
 
-    next.unshift( instruction[0] )
-    // now jump back into create point
+    expandMultiPoints( accumulator, next ) // get next point
 }
 
 function createPoint ( instruction ) {
     // console.log( instruction )
     var type = instruction[ 0 ].toUpperCase();
     if ( type === 'V' ) {
-        multiPoint( instruction, 2 )
         return {
             y: +instruction[ 1 ]
         }
     }
     if ( type === 'H' ) {
-        multiPoint( instruction, 2 )
         return {
             x: +instruction[ 1 ]
         }
     }
     if ( type === 'L' || type === 'M' ) {
-        multiPoint( instruction, 3 )
         return {
             x : +instruction[ 1 ],
             y: +instruction[ 2 ]
         }
     }
     if ( type === 'S' ) {
-        multiPoint( instruction, 5 )
         return {
             x2: +instruction[ 1 ],
             y2: +instruction[ 2 ],
@@ -63,7 +68,6 @@ function createPoint ( instruction ) {
         }
     }
     if ( type === 'Q' ) {
-        multiPoint( instruction, 5 )
         return {
             x1: +instruction[ 1 ],
             y1: +instruction[ 2 ],
@@ -72,7 +76,6 @@ function createPoint ( instruction ) {
         }
     }
     if ( type === 'A' ) {
-        multiPoint( instruction, 8 )
         return {
             rx: +instruction[ 1 ],
             ry: +instruction[ 2 ],
@@ -84,7 +87,6 @@ function createPoint ( instruction ) {
         }
     }
     if ( type === 'C' ) {
-        multiPoint( instruction, 7 )
         return {
             x1: +instruction[ 1 ],
             y1: +instruction[ 2 ],
@@ -95,7 +97,7 @@ function createPoint ( instruction ) {
         }
     }
     // need to support T https://github.com/jcblw/vsvg-paths/issues/3
-    return {};
+    return {}
 }
 
 function filterNull ( n ) {
@@ -106,14 +108,23 @@ function trimEach( str ) {
     return str.trim()
 }
 
+/*
+    Unfold this is the opposite of reduce, you can take an array with mutiple values
+    and expands them to event more values
+*/
+
+function unfold( array, iterator ) {
+    var accumulator = []
+    array.forEach( iterator.bind( array, accumulator ) )
+    return accumulator
+}
+
 module.exports.decode = function ( pathData ) {
 
     var instructions = pathData.match( eachInstPattern )
-            .filter( filterNull )
             .filter( startsWithAlpha )
             .map( splitInstruction )
+
+    return unfold( instructions, expandMultiPoints )
             .map( createPoint )
-
-    return instructions
-
 }
