@@ -1,7 +1,6 @@
-
 'use strict';
 
-var eachInstPattern = /(([a-z]+)(\s?\,?(\-?[0-9]+\.?[0-9]*))+)/gi,
+var eachInstPattern = /(([a-z]+)((\s?\,?(\-?[0-9]+\.?[0-9]*))+)?)/gi,
     instPattern = /([a-z]+)|(\-?[0-9]+\.?[0-9]*)/gi,
     alphastart = /^[A-Z]/i,
     lengths = {
@@ -15,14 +14,48 @@ var eachInstPattern = /(([a-z]+)(\s?\,?(\-?[0-9]+\.?[0-9]*))+)/gi,
         C: 7
     }
 
+/*
+    vsvg-paths.decode - decode path data into a collection of points
+    ------------------------------------------------------------------
+
+    params
+        path { String } - a svg path data string that can contain special chars like ,.-
+            eg M5 5 L100 100 C100 100 250 100 250 200 S400 300 400 200 H500 V100
+    returns
+        points { Array } - an array of points see encode / documentation to see what points look like
+            
+*/
+
+module.exports.decode = function decode( pathData ) {
+
+    var instructions = pathData.match( eachInstPattern )
+            .map( splitInstruction )
+
+    return unfold( instructions, expandMultiPoints )
+            .map( createPoint )
+}
+
+var splitInstruction =
+module.exports._splitInstruction =
 function splitInstruction ( instruction ) {
     return instruction.match( instPattern );
 }
 
-function startsWithAlpha ( instruction ) {
-    return alphastart.test( instruction )
+/*
+    Unfold this is the opposite of reduce, you can take an array with mutiple values
+    and expands them to event more values
+*/
+
+var unfold =
+module.exports._unfold =
+function unfold( array, iterator ) {
+    var accumulator = []
+    array.forEach( iterator.bind( array, accumulator ) )
+    return accumulator
 }
 
+var expandMultiPoints =
+module.exports._expandMultiPoints =
 function expandMultiPoints( accumulator, instruction ) {
     
     var instruct = instruction[ 0 ].toUpperCase(),
@@ -40,8 +73,10 @@ function expandMultiPoints( accumulator, instruction ) {
     expandMultiPoints( accumulator, next ) // get next point
 }
 
+var createPoint =
+module.exports._createPoint =
 function createPoint ( instruction ) {
-    // console.log( instruction )
+
     var type = instruction[ 0 ].toUpperCase();
     if ( type === 'V' ) {
         return {
@@ -98,33 +133,4 @@ function createPoint ( instruction ) {
     }
     // need to support T https://github.com/jcblw/vsvg-paths/issues/3
     return {}
-}
-
-function filterNull ( n ) {
-    return n
-}
-
-function trimEach( str ) {
-    return str.trim()
-}
-
-/*
-    Unfold this is the opposite of reduce, you can take an array with mutiple values
-    and expands them to event more values
-*/
-
-function unfold( array, iterator ) {
-    var accumulator = []
-    array.forEach( iterator.bind( array, accumulator ) )
-    return accumulator
-}
-
-module.exports.decode = function ( pathData ) {
-
-    var instructions = pathData.match( eachInstPattern )
-            .filter( startsWithAlpha )
-            .map( splitInstruction )
-
-    return unfold( instructions, expandMultiPoints )
-            .map( createPoint )
 }
