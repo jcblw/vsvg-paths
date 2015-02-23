@@ -14,11 +14,6 @@ test( 'testing encode::_keyValueArray', function( t ) {
     t.end()
 } )
 
-test( 'testing encode::_mapLowerCase', function( t ) {
-    t.equals( encode._mapLowerCase( 'FOO' ), 'foo', 'word passed to mapLowerCase it lower cased' )
-    t.end()
-} )
-
 test( 'testing encode::_getValue', function( t ) {
     t.equals( typeof encode._getValue(), 'function', ' the return of _getValue is a function' )
     t.equals( encode._getValue( 'foo' )( [ null, 'bar' ], 0 ), 'foobar', 'if second argument of returned function is falsey the first argument of _getValue will be append to the second item in the first arugment (Array) of the returned function' )
@@ -106,9 +101,29 @@ test( 'testing encode::encode', function( t ) {
         },
         { x1: 100, y1: 300, x: 25, y: 250 }, // quadratic Bézier 
         {}
+    ],
+    relPath = [ 
+        { x: 5, y: 5, rel: true }, // moveto
+        { x: 100, y: 200, rel: true }, // lineto
+        { x1: 100 , y1: 100, x2: 250, y2: 100, x: 250, y: 200, rel: true }, // curveto
+        { x2: 400, y2: 300, x: 400, y: 200, rel: true }, // shorthand curve
+        { x: 500, rel: true }, // horizontal line
+        { y: 100, rel: true }, // vertical line
+        { // elliptical arc
+            rx: 25,
+            ry: 25,
+            xrotate: -30,
+            largearc: 0,
+            sweep: 1,
+            x: 250,
+            y: 250,
+            rel: true 
+        },
+        { x1: 100, y1: 300, x: 25, y: 250, rel: true }, // quadratic Bézier 
+        { rel: true }
     ]
     t.equals( encode.encode(), undefined, 'if a non array argument is passed into the first parameter of encode undefined will be returned' )
     t.equals( encode.encode( path ), 'M5 5 L100 200 C100 100 250 100 250 200 S400 300 400 200 H500 V100 A25 25 -30 0 1 250 250 Q100 300 25 250 Z', 'the correct path is outputed' )
-    t.equals( encode.encode( path, true ), 'm5 5 l100 200 c100 100 250 100 250 200 s400 300 400 200 h500 v100 a25 25 -30 0 1 250 250 q100 300 25 250 z', 'the correct path is outputed, with lowercase instructions for relative positioning' )
+    t.equals( encode.encode( relPath ), 'm5 5 l100 200 c100 100 250 100 250 200 s400 300 400 200 h500 v100 a25 25 -30 0 1 250 250 q100 300 25 250 z', 'the correct path is outputed, with lowercase instructions for relative positioning' )
     t.end()
 })

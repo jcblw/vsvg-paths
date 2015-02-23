@@ -80,18 +80,21 @@ function createPoint ( instruction ) {
     var type = instruction[ 0 ].toUpperCase();
     if ( type === 'V' ) {
         return {
-            y: +instruction[ 1 ]
+            y: +instruction[ 1 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     if ( type === 'H' ) {
         return {
-            x: +instruction[ 1 ]
+            x: +instruction[ 1 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     if ( type === 'L' || type === 'M' ) {
         return {
             x : +instruction[ 1 ],
-            y: +instruction[ 2 ]
+            y: +instruction[ 2 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     if ( type === 'S' ) {
@@ -99,7 +102,8 @@ function createPoint ( instruction ) {
             x2: +instruction[ 1 ],
             y2: +instruction[ 2 ],
             x: +instruction[ 3 ],
-            y: +instruction[ 4 ]
+            y: +instruction[ 4 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     if ( type === 'Q' ) {
@@ -107,7 +111,8 @@ function createPoint ( instruction ) {
             x1: +instruction[ 1 ],
             y1: +instruction[ 2 ],
             x: +instruction[ 3 ],
-            y: +instruction[ 4 ]
+            y: +instruction[ 4 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     if ( type === 'A' ) {
@@ -118,7 +123,8 @@ function createPoint ( instruction ) {
             largearc: +instruction[ 4 ],
             sweep: +instruction[ 5 ],
             x: +instruction[ 6 ],
-            y: +instruction[ 7 ]
+            y: +instruction[ 7 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     if ( type === 'C' ) {
@@ -128,7 +134,8 @@ function createPoint ( instruction ) {
             x2: +instruction[ 3 ],
             y2: +instruction[ 4 ],
             x: +instruction[ 5 ],
-            y: +instruction[ 6 ]
+            y: +instruction[ 6 ],
+            rel: instruction[ 0 ] !== type
         }
     }
     // need to support T https://github.com/jcblw/vsvg-paths/issues/3

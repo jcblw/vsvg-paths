@@ -1,6 +1,6 @@
 # vsvg-paths ( virtual SVG path )  [![Build Status](https://travis-ci.org/jcblw/vsvg-paths.svg?branch=master)](https://travis-ci.org/jcblw/vsvg-paths)
 
-vsvg path is a small lib to abstract the path data syntax for svgs into an json object.
+vsvg path is a small lib to abstract the path data syntax for svgs into an json object. This help with manipulating points on the fly in javascript with ease. If you have an exsisting path data you can decode it into the structure as well.
 
 # Install
 
@@ -9,6 +9,8 @@ vsvg path is a small lib to abstract the path data syntax for svgs into an json 
 # Usage
 
 ## encode
+
+Encode a array with objects, aka points, into path data for svg path d attributes. 
 
 ```javascript
 
@@ -22,15 +24,52 @@ var paths = require( 'vsvg-paths' ),
         {
             x: 10,
             y: 10
+        },
+        {
+            x: 1,
+            y: 1,
+            relative: true 
         }
-    ]); // M0 0 L10 10
+    ]); // M0 0 L10 10 l1 1
 
 path.setAttribute( 'd', data );
 ```
 
+see [point types](#points-types) to see what point types are supported
+
+## decode
+
+Decode an existing set of path data into the JSON tree that you can pass to encode.
+
+```javascript
+
+var paths = require( 'vsvg-paths' ),
+    path = 'M0 0 L10 10 l1 1',
+    data = paths.decode( path )
+
+console.log( data ) 
+/*  
+    [
+        {
+            x: 0,
+            y: 0
+        },
+        {
+            x: 10,
+            y: 10
+        },
+        {
+            x: 1,
+            y: 1,
+            rel: true // same as relative: true
+        }
+    ]
+*/
+```
+
 ### Points types
 
-Very closely based off of [Path Data Spec](http://www.w3.org/TR/SVG/paths.html#PathData). Please referance there for more specifics of what points represent.
+Very closely based off of [Path Data Spec](http://www.w3.org/TR/SVG/paths.html#PathData). Please referance there for more specifics of what points represent. Also if the key `rel` or `relative` is set to true the path with encoded with a lower case instruction making the point relative to the last point.
 
 - Move To: The first point in an array of points that has only a x and y value eg.
 ```json

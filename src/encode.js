@@ -36,7 +36,7 @@ var sortValues = {
 */
 
 module.exports.encode = 
-function encode( path, isRelative ) {
+function encode( path ) {
     
     if ( !Array.isArray( path ) ) {
         return
@@ -44,9 +44,6 @@ function encode( path, isRelative ) {
     var instructions = path.map( getInstruction ),
         values
 
-    if ( isRelative ) {
-        instructions = instructions.map( mapLowerCase )
-    }
     values = path.map( keyValueArray ) // [ [ [ y, 0 ], [ x, 0 ] ] ]
             .map( sortPoints ) // [ [ x, 0 ], [ y, 0 ] ] according to sort values
             .map( stringifyPoints( instructions ) )  // [ 'M0 0' ]
@@ -59,15 +56,11 @@ module.exports._keyValueArray =
 function keyValueArray( points ) {
     var ret = []
     for( var key in points ) {
-        ret.push( [ key, points[ key ] ] )
+        if ( !( key === 'rel' || key === 'relative' ) ) {
+            ret.push( [ key, points[ key ] ] )
+        }
     }
     return ret
-}
-
-var mapLowerCase =
-module.exports._mapLowerCase = 
-function mapLowerCase ( str ) {
-    return str.toLowerCase()
 }
 
 var getValue =
@@ -113,29 +106,33 @@ function isValid ( value ) {
 var getInstruction =
 module.exports._getInstruction =
 function getInstruction ( points, index ) {
+    var instruction
     if ( isValid( points.x2 )  && isValid( points.y2 ) && isValid( points.x1 ) && isValid( points.y1 ) ) {
-        return 'C'
+        instruction = 'C'
     }
-    if ( isValid( points.rx ) && isValid( points.ry ) ) {
-        return 'A'
+    if ( !instruction && isValid( points.rx ) && isValid( points.ry ) ) {
+        instruction = 'A'
     }
-    if ( isValid( points.x1 ) && isValid( points.y1 ) ) {
-        return 'Q'
+    if ( !instruction && isValid( points.x1 ) && isValid( points.y1 ) ) {
+        instruction = 'Q'
     }
-    if ( isValid( points.x2 ) && isValid( points.y2 ) ) {
-        return 'S'
+    if ( !instruction && isValid( points.x2 ) && isValid( points.y2 ) ) {
+        instruction = 'S'
     }
-    if ( isValid( points.x ) && isValid( points.y ) ) {
+    if ( !instruction && isValid( points.x ) && isValid( points.y ) ) {
+        instruction = 'L'
         if ( !index ) {
-            return 'M'
+            instruction = 'M'
         }
-        return 'L'
     }
-    if ( isValid( points.x ) ) {
-        return 'H'
+    if ( !instruction && isValid( points.x ) ) {
+        instruction = 'H'
     }
-    if ( isValid( points.y ) ) {
-        return 'V'
+    if ( !instruction && isValid( points.y ) ) {
+        instruction = 'V'
     }
-    return 'Z'
+    if ( !instruction ) {
+        instruction = 'Z'
+    }
+    return points.relative || points.rel ? instruction.toLowerCase() : instruction
 }
