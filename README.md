@@ -1,5 +1,7 @@
 # vsvg-paths ( virtual SVG path )  [![Build Status](https://travis-ci.org/jcblw/vsvg-paths.svg?branch=master)](https://travis-ci.org/jcblw/vsvg-paths)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jcblw/vsvg-paths.svg)](https://greenkeeper.io/)
+
 vsvg path is a small lib to abstract the path data syntax for svgs into an json object. This help with manipulating points on the fly in javascript with ease. If you have an exsisting path data you can decode it into the structure as well.
 
 # Install
